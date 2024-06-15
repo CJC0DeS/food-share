@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { getTestRouterouter } from "./routes/user.routes.js";
+import { getTestRouter } from "./routes/user.routes.js";
 dotenv.config();
 
 mongoose
@@ -18,4 +18,4 @@ app.listen(3000, () => {
   console.log("server is running at 3000");
 });
 
-app.use("/api/user", getTestRouterouter);
+app.use("/api/user", getTestRouter);
