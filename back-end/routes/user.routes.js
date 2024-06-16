@@ -1,9 +1,9 @@
 import express from "express";
 import { test } from "../controllers/user.controller.js";
 
-const getTestRouter = express.Router();
+const testRouter = express.Router();
 
-getTestRouter.get("/test",test);
+testRouter.get("/test",test);
 
 
-export {getTestRouter}
+export {testRouter}
