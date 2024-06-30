@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/user/userSlice";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -8,6 +10,7 @@ export default function SignUp() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch()
   const nav = useNavigate();
   const handleSigninData = async (event) => {
     setLoading(true);
@@ -23,6 +26,7 @@ export default function SignUp() {
         setLoading(false);
         return;
       } else {
+        dispatch(setUser(data))
         setError(null);
         nav("/");
       }
