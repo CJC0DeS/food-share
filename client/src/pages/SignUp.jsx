@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import GoogleAuth from "../components/GoogleAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -74,6 +75,7 @@ export default function SignUp() {
         >
           {!loading ? "Sign Up" : "Setting up your account... Almost there!"}
         </button>
+        <GoogleAuth />
       </form>
       <div className="flex mt-5">
         <div className="flex mx-auto gap-4">

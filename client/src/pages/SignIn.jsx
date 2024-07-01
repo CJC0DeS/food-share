@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/user/userSlice";
+import GoogleAuth from "../components/GoogleAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -70,6 +71,7 @@ export default function SignUp() {
         >
           {!loading ? "Sign In" : "Verifying credentials..."}
         </button>
+        <GoogleAuth />
       </form>
       <div className="flex mt-5">
         <div className="flex mx-auto gap-4">
