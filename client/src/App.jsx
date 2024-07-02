@@ -5,6 +5,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import About from "./pages/About";
 import Header from "./components/Header";
+import Profile from "./pages/Profile";
 
 export default function App() {
   return (
