@@ -12,11 +12,13 @@ import {
 } from "firebase/storage";
 import { setUser } from "../redux/user/userSlice";
 import { app } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const dispatch = useDispatch();
+  const nav = useNavigate()
   const [file, setFile] = useState(undefined);
   const [imageUploadPercent, setImageUploadPercent] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -46,6 +48,27 @@ export default function Profile() {
       }
       dispatch(setUser(data));
       setError(null);
+    } catch (error) {
+      console.log("error", error)
+      setError("Failed to Update");
+    }
+    setLoading(false);
+  };
+
+  const handleDeleteUser = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/user/delete/user/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
+      dispatch(setUser(null));
+      // nav("/sign-in");
     } catch (error) {
       console.log("error", error)
       setError("Failed to Update");
@@ -171,6 +194,8 @@ export default function Profile() {
       <div className="mt-4 flex flex-row justify-between">
         <button
           type="button"
+          disabled={loading}
+          onClick={handleDeleteUser}
           className="flex flex-row content-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-3xl text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600"
         >
           <Icon path={mdiTrashCanOutline} size={1} className="mr-2" />
