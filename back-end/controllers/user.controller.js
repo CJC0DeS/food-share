@@ -45,3 +45,23 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id) {
+    try {
+      errorHandler(
+        401,
+        "Unauthorized deletion: JWT User id and current user id mismatch"
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.clearCookie('access_token');
+    res.status(200).json('User deleted successfully!');
+  } catch (error) {
+    next(error);
+  }
+};
