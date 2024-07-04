@@ -24,12 +24,12 @@ app.use("/api/user", testRouter);
 app.use("/api/auth", authRouter);
 
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500
-  const message = err.message || "Server Error"
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Server Error";
 
   return res.status(statusCode).json({
     success: false,
     statusCode,
-    message
-  })
+    message,
+  });
 });
