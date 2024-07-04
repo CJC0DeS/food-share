@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Icon from "@mdi/react";
 import { mdiTrashCanOutline } from "@mdi/js";
 import { mdiLogout } from "@mdi/js";
@@ -10,18 +10,47 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { setUser } from "../redux/user/userSlice";
 import { app } from "../firebase";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const fileRef = useRef(null);
+  const dispatch = useDispatch();
   const [file, setFile] = useState(undefined);
   const [imageUploadPercent, setImageUploadPercent] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  console.log(formData);
-  const handleChange = (event) => {
-    console.log("WASSUP");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/user/update/user/${currentUser._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
+      dispatch(setUser(data));
+      setError(null);
+    } catch (error) {
+      console.log("error", error)
+      setError("Failed to Update");
+    }
+    setLoading(false);
   };
   useEffect(() => {
     if (file) {
@@ -56,7 +85,7 @@ export default function Profile() {
       <h1 className="text-3xl text-center font-semibold my-7 text-lime-700">
         Profile
       </h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -115,6 +144,7 @@ export default function Profile() {
           className="border p-3 px-5 rounded-3xl bg-lime-100 focus:outline-lime-500 text-lime-800"
           id="username"
           onChange={handleChange}
+          defaultValue={currentUser.username}
         />
         <input
           type="email"
@@ -122,6 +152,7 @@ export default function Profile() {
           className="border p-3 px-5 rounded-3xl  bg-lime-100  focus:outline-lime-500 text-lime-800"
           id="email"
           onChange={handleChange}
+          defaultValue={currentUser.email}
         />
         <input
           type="password"
@@ -130,8 +161,11 @@ export default function Profile() {
           id="password"
           onChange={handleChange}
         />
-        <button className="bg-lime-300 text-lime-800 p-3 rounded-3xl uppercase hover:opacity-75 disabled:opacity-50">
-          Update
+        <button
+          className="bg-lime-300 text-lime-800 p-3 rounded-3xl uppercase hover:opacity-75 disabled:opacity-50"
+          disabled={loading}
+        >
+          {!loading ? "Update" : "Updating..."}
         </button>
       </form>
       <div className="mt-4 flex flex-row justify-between">
@@ -150,6 +184,17 @@ export default function Profile() {
           Sign Out
         </button>
       </div>
+      {error && (
+        <div
+          className="flex bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4"
+          role="alert"
+        >
+          <div className="mx-auto">
+            <strong className="font-bold">Error ! </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
