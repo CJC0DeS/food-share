@@ -12,7 +12,8 @@ import {
 } from "firebase/storage";
 import { setUser } from "../redux/user/userSlice";
 import { app } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { mdiChevronTripleRight } from "@mdi/js";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -210,6 +211,15 @@ export default function Profile() {
           {!loading ? "Update" : "Updating..."}
         </button>
       </form>
+      <div className="mt-4 flex flex-col justify-between">
+        <Link
+          to="/food-posting"
+          className="relative flex flex-row content-center justify-center text-white p-3 rounded-3xl uppercase hover:opacity-75 disabled:opacity-50 bg-lime-700"
+        >
+          DONATE FOOD
+          <Icon path={mdiChevronTripleRight} size={1} />
+        </Link>
+      </div>
       <div className="mt-4 flex flex-row justify-between">
         <button
           type="button"
