@@ -16,7 +16,17 @@ const foodpostSchema = new mongoose.Schema(
     mealType: {
       type: String,
     },
+    primaryContact: {
+      type: Number,
+      required: true,
+    },
+    alternateContact: {
+      type: Number,
+    },
     servings: {
+      type: Number,
+    },
+    hoursElapsed: {
       type: Number,
     },
     indeterminateServings: {
