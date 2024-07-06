@@ -205,27 +205,31 @@ export default function FoodPosting() {
               </div>
             </div>
           )}
-          {formData.imageUrl.length > 0 &&
-            formData.imageUrl.map((url, index) => (
-              <div
-                key={url}
-                className="flex justify-between p-3 border items-center"
-              >
-                <img
-                  src={url}
-                  alt="listing image"
-                  className="w-20 h-20 object-contain rounded-lg mr-2"
-                />
-                <p>{imageNameList[index]}</p>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="p-3 text-red-700 rounded-lg uppercase hover:opacity-75"
+          <div className="grid grid-cols-2 gap-4">
+            {formData.imageUrl.length > 0 &&
+              formData.imageUrl.map((url, index) => (
+                <div
+                  key={url}
+                  className="flex justify-between p-3 border items-center"
                 >
-                  <Icon path={mdiTrashCanOutline} size={1} />
-                </button>
-              </div>
-            ))}
+                  <img
+                    src={url}
+                    alt="Food List Image"
+                    className="w-20 h-20 object-contain rounded-lg mr-2"
+                  />
+                  <p className="block sm:hidden lg:block">
+                    {imageNameList[index]}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="p-3 text-red-700 rounded-lg uppercase hover:opacity-75"
+                  >
+                    <Icon path={mdiTrashCanOutline} size={1} />
+                  </button>
+                </div>
+              ))}
+          </div>
         </div>
       </form>
       <div className="mt-8">
