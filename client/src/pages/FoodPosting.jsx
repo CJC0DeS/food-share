@@ -1,6 +1,82 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase";
+import Icon from "@mdi/react";
+import { mdiTrashCanOutline } from "@mdi/js";
 
 export default function FoodPosting() {
+  const [images, setimages] = useState([]);
+  const [formData, setFormData] = useState({ imageUrl: [] });
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [imageUploadingStatus, setImageUploadingStatus] = useState(false);
+  const [imageNameList, setImageNameList] = useState([]);
+  const handleImagesSubmit = async (e) => {
+    setImageUploadingStatus(true);
+    if (images.length > 0 && images.length < 7) {
+      const promises = [];
+
+      for (let i = 0; i < images.length; i++) {
+        promises.push(storeImage(images[i]));
+      }
+      await Promise.all(promises)
+        .then((url) => {
+          setFormData({
+            ...formData,
+            imageUrl: formData.imageUrl.concat(url),
+          });
+        })
+        .catch((err) => {
+          setImageUploadError("IMAGE UPLOAD FAILED: MAX IMAGE SIZE 2MB");
+        });
+    } else {
+      if (images.length === 0)
+        setImageUploadError("UPLOAD ATLEAST 1 IMAGE TO CONTINUE");
+      else
+        setImageUploadError(
+          "IMAGE UPLOAD FAILED: CANNOT UPLOAD MORE THAN 6 IMAGES"
+        );
+    }
+    setImageUploadingStatus(false);
+  };
+  const storeImage = async (file) => {
+    return new Promise((resolve, reject) => {
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + file.name;
+      setImageNameList((prevImageNameList) => [
+        ...prevImageNameList,
+        file.name,
+      ]);
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  };
+  const handleRemoveImage = (index) => {
+    setFormData({
+      ...formData,
+      imageUrl: formData.imageUrl.filter((_, i) => i !== index),
+    });
+  };
   return (
     <main className=" p-3 max-w-8xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-lime-700">
@@ -106,11 +182,50 @@ export default function FoodPosting() {
               id="images"
               accept="image/*"
               multiple
+              onChange={(e) => {
+                setimages(e.target.files);
+              }}
             />
-            <button className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80">
-              Upload
+            <button
+              disabled={imageUploadingStatus}
+              onClick={handleImagesSubmit}
+              className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
+            >
+              {!imageUploadingStatus ? "Upload" : "Uploading..."}
             </button>
           </div>
+          {imageUploadError && (
+            <div
+              className="flex mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4"
+              role="alert"
+            >
+              <div className="mx-auto">
+                <strong className="font-bold">Error ! </strong>
+                <span className="block sm:inline">{imageUploadError}</span>
+              </div>
+            </div>
+          )}
+          {formData.imageUrl.length > 0 &&
+            formData.imageUrl.map((url, index) => (
+              <div
+                key={url}
+                className="flex justify-between p-3 border items-center"
+              >
+                <img
+                  src={url}
+                  alt="listing image"
+                  className="w-20 h-20 object-contain rounded-lg mr-2"
+                />
+                <p>{imageNameList[index]}</p>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="p-3 text-red-700 rounded-lg uppercase hover:opacity-75"
+                >
+                  <Icon path={mdiTrashCanOutline} size={1} />
+                </button>
+              </div>
+            ))}
         </div>
       </form>
       <div className="mt-8">
