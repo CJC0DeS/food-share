@@ -32,7 +32,7 @@ const foodpostSchema = new mongoose.Schema(
     indeterminateServings: {
       type: String,
     },
-    imageUrls: {
+    imageUrl: {
       type: Array,
       required: true,
     },
