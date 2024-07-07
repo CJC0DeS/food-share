@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
+import Foodpost from "../models/foodpost.model.js";
 
 export const test = (req, res) => {
   res.json({
@@ -65,3 +66,23 @@ export const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getUserPosts = async (req, res, next) => {
+  if (req.user.id !== req.params.id) {
+    try {
+      errorHandler(
+        401,
+        "Unauthorized request: JWT User id and current user id mismatch"
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+  try {
+    const query = { userRef: req.params.id };
+    const foodPosts = await Foodpost.find(query);
+    return res.status(200).json(foodPosts);
+  } catch (error) {
+    next(error);
+  }
+}
