@@ -8,13 +8,35 @@ import {
 import { app } from "../firebase";
 import Icon from "@mdi/react";
 import { mdiTrashCanOutline } from "@mdi/js";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function FoodPosting() {
   const [images, setimages] = useState([]);
-  const [formData, setFormData] = useState({ imageUrl: [] });
+  const [formData, setFormData] = useState({
+    imageUrl: [],
+    name: "",
+    description: "",
+    pickupAddress: "",
+    mealType: "",
+    primaryContact: "",
+    alternateContact: "",
+    servings: "",
+    hoursElapsed: "",
+  });
+  const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const [imageUploadError, setImageUploadError] = useState(null);
   const [imageUploadingStatus, setImageUploadingStatus] = useState(false);
+  const [postError, setPostError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [imageNameList, setImageNameList] = useState([]);
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
   const handleImagesSubmit = async (e) => {
     setImageUploadingStatus(true);
     if (images.length > 0 && images.length < 7) {
@@ -23,16 +45,16 @@ export default function FoodPosting() {
       for (let i = 0; i < images.length; i++) {
         promises.push(storeImage(images[i]));
       }
-      await Promise.all(promises)
-        .then((url) => {
-          setFormData({
-            ...formData,
-            imageUrl: formData.imageUrl.concat(url),
-          });
-        })
-        .catch((err) => {
-          setImageUploadError("IMAGE UPLOAD FAILED: MAX IMAGE SIZE 2MB");
+      try {
+        const urls = await Promise.all(promises);
+        setFormData({
+          ...formData,
+          imageUrl: formData.imageUrl.concat(urls),
         });
+        setImageUploadError(null);
+      } catch (err) {
+        setImageUploadError("IMAGE UPLOAD FAILED: MAX IMAGE SIZE 2MB");
+      }
     } else {
       if (images.length === 0)
         setImageUploadError("UPLOAD ATLEAST 1 IMAGE TO CONTINUE");
@@ -71,6 +93,35 @@ export default function FoodPosting() {
       );
     });
   };
+  const handleSubmit = async () => {
+    try {
+      if (formData.imageUrl.length < 1)
+        return setPostError(
+          "POST CREATION FAILED: UPLOAD ATLEAST 1 IMAGE TO CONTINUE"
+        );
+      setLoading(true);
+      setPostError(false);
+      const res = await fetch("/api/foodpost/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+        }),
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (data.success === false) {
+        setPostError(data.message);
+      }
+      navigate(`/listing/user/${data._id}`);
+    } catch (error) {
+      setPostError(error.message);
+      setLoading(false);
+    }
+  };
   const handleRemoveImage = (index) => {
     setFormData({
       ...formData,
@@ -94,6 +145,8 @@ export default function FoodPosting() {
               maxLength="62"
               minLength="10"
               required
+              onChange={handleChange}
+              value={formData.name}
             />
           </div>
           <div className="flex">
@@ -103,6 +156,8 @@ export default function FoodPosting() {
               placeholder="Description (Add description about the contents, include potential allergens)"
               className="w-full border p-3 rounded-lg  bg-lime-100 focus:outline-lime-500 text-lime-800"
               id="description"
+              onChange={handleChange}
+              value={formData.description}
             />
           </div>
           <div className="flex">
@@ -111,8 +166,10 @@ export default function FoodPosting() {
               type="text"
               placeholder="Your Address (Pickup address)*"
               className="w-full border p-3 rounded-lg  bg-lime-100 focus:outline-lime-500 text-lime-800"
-              id="address"
+              id="pickupAddress"
               required
+              onChange={handleChange}
+              value={formData.pickupAddress}
             />
           </div>
           <div className="flex">
@@ -121,7 +178,9 @@ export default function FoodPosting() {
               type="text"
               placeholder="Meal Type"
               className="w-full border p-3 rounded-lg  bg-lime-100 focus:outline-lime-500 text-lime-800"
-              id="meal-type"
+              id="mealType"
+              onChange={handleChange}
+              value={formData.mealType}
             />
           </div>
           <div className="flex">
@@ -131,7 +190,9 @@ export default function FoodPosting() {
               required
               placeholder="Contact Number*"
               className="w-full border p-3 rounded-lg  bg-lime-100 focus:outline-lime-500 text-lime-800"
-              id="primary-contact-no"
+              id="primaryContact"
+              onChange={handleChange}
+              value={formData.primaryContact}
             />
           </div>
           <div className="flex">
@@ -141,7 +202,9 @@ export default function FoodPosting() {
               required
               placeholder="Alternate Contact Number"
               className="w-full border p-3 rounded-lg  bg-lime-100 focus:outline-lime-500 text-lime-800"
-              id="primary-contact-no"
+              id="alternateContact"
+              onChange={handleChange}
+              value={formData.alternateContact}
             />
           </div>
           <div className="flex">
@@ -153,6 +216,8 @@ export default function FoodPosting() {
               min="1"
               max="1000"
               className="w-full p-3 border border-gray-300 rounded-lg bg-lime-100"
+              onChange={handleChange}
+              value={formData.servings}
             />
           </div>
           <div className="flex">
@@ -160,11 +225,13 @@ export default function FoodPosting() {
             <input
               placeholder="Hours elapsed after cooking*"
               type="number"
-              id="hours-elapsed"
+              id="hoursElapsed"
               min="0"
               max="24"
               required
               className="p-3 border border-gray-300 rounded-lg bg-lime-100 w-full"
+              onChange={handleChange}
+              value={formData.hoursElapsed}
             />
           </div>
         </div>
@@ -233,10 +300,25 @@ export default function FoodPosting() {
         </div>
       </form>
       <div className="mt-8">
-        <button className=" mx-auto flex flex-row justify-center align-center p-3 bg-lime-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80 w-64">
-          Create Post
+        <button
+          onClick={handleSubmit}
+          disabled={loading || imageUploadingStatus}
+          className=" mx-auto flex flex-row justify-center align-center p-3 bg-lime-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80 w-64"
+        >
+          {!loading ? "Create Post" : "Hold on..."}
         </button>
       </div>
+      {postError && (
+        <div
+          className="flex mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4 max-w-fit"
+          role="alert"
+        >
+          <div className="mx-auto">
+            <strong className="font-bold">Error ! </strong>
+            <span className="block sm:inline">{postError}</span>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
