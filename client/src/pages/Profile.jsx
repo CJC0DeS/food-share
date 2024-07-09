@@ -219,6 +219,12 @@ export default function Profile() {
           DONATE FOOD
           <Icon path={mdiChevronTripleRight} size={1} />
         </Link>
+        <Link
+          to="/all-food-postings"
+          className="relative flex flex-row content-center justify-center text-white p-3 rounded-3xl uppercase hover:opacity-75 disabled:opacity-50 bg-lime-700 mt-4"
+        >
+          ACTIVE POSTINGS
+        </Link>
       </div>
       <div className="mt-4 flex flex-row justify-between">
         <button

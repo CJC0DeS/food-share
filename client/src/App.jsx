@@ -8,6 +8,7 @@ import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./pages/Profile";
 import FoodPosting from "./pages/FoodPosting";
+import AllFoodPostings from "./pages/AllFoodPostings";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/food-posting" element={<FoodPosting />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="all-food-postings" element={<AllFoodPostings />} />
         </Route>
       </Routes>
     </BrowserRouter>
