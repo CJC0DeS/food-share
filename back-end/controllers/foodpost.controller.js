@@ -31,3 +31,29 @@ export const deletefoodpost = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateFoodpost = async (req, res, nest) => {
+  const foodPost = await Foodpost.findById(req.params.id);
+  if (!foodPost) {
+    return next(errorHandler(404, "Post not found!"));
+  }
+  if (req.user.id !== foodPost.userRef) {
+    return next(
+      errorHandler(
+        401,
+        "Unauthorized request: You can only delete your own post"
+      )
+    );
+  }
+
+  try {
+    const updatedPost = await Foodpost.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    next(error);
+  }
+};
