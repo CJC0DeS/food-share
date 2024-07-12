@@ -26,6 +26,24 @@ export default function AllFoodPostings() {
     fetchPostings();
   }, []);
 
+  const handlePostDelete = async (postingId) => {
+    try {
+      const res = await fetch(`/api/foodpost/delete/${postingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        return;
+      }
+
+      setUserPostings((prev) =>
+        prev.filter((posting) => posting._id !== postingId)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   console.log(userPostings);
   return (
     <main className=" p-3 max-w-5xl mx-auto">
@@ -73,7 +91,12 @@ export default function AllFoodPostings() {
                 </div>
 
                 <div className="flex flex-col item-center">
-                  <button className="text-red-700 uppercase">Delete</button>
+                  <button
+                    className="text-red-700 uppercase"
+                    onClick={() => handlePostDelete(posting._id)}
+                  >
+                    Delete
+                  </button>
                   <button className="text-green-700 uppercase">Edit</button>
                 </div>
               </div>
