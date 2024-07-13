@@ -57,3 +57,15 @@ export const updateFoodpost = async (req, res, nest) => {
     next(error);
   }
 };
+
+export const getListing = async (req, res, next) => {
+  try {
+    const foodPost = await Foodpost.findById(req.params.id);
+    if (!foodPost) {
+      return next(errorHandler(404, "Post not found!"));
+    }
+    res.status(200).json(foodPost);
+  } catch (error) {
+    next(error);
+  }
+};
