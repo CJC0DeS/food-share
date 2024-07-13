@@ -7,7 +7,7 @@ import About from "./pages/About";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./pages/Profile";
-import FoodPosting from "./pages/FoodPosting";
+import FoodPosting from "./pages/CreateFoodPosting";
 import AllFoodPostings from "./pages/AllFoodPostings";
 
 export default function App() {
