@@ -9,6 +9,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./pages/Profile";
 import FoodPosting from "./pages/CreateFoodPosting";
 import AllFoodPostings from "./pages/AllFoodPostings";
+import EditFoodPosting from "./pages/EditFoodPosting";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/food-posting" element={<FoodPosting />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="all-food-postings" element={<AllFoodPostings />} />
+          <Route path="/foodpost/:postId" element={<EditFoodPosting />} />
         </Route>
       </Routes>
     </BrowserRouter>
