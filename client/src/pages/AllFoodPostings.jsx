@@ -69,7 +69,7 @@ export default function AllFoodPostings() {
                 className="border rounded-lg p-3 flex justify-between items-center gap-4"
               >
                 <p>{formatDateToReadable(posting.createdAt)}</p>
-                <Link to={`/foodpost/${posting._id}`}>
+                <Link to={`/foodpost-info/${posting._id}`}>
                   <img
                     src={
                       posting.imageUrl.length
@@ -82,7 +82,7 @@ export default function AllFoodPostings() {
                 </Link>
                 <Link
                   className="text-slate-700 font-semibold  hover:underline truncate flex-1"
-                  to={`/foodpost/${posting._id}`}
+                  to={`/foodpost-info/${posting._id}`}
                 >
                   <p>{posting.name}</p>
                 </Link>

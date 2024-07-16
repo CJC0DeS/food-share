@@ -118,7 +118,7 @@ export default function FoodPosting() {
       if (data.success === false) {
         setPostError(data.message);
       }
-      navigate(`/foodpost/${data._id}`);
+      navigate(`/foodpost-info/${data._id}`);
     } catch (error) {
       setPostError(error.message);
       setLoading(false);

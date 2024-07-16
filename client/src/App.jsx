@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import FoodPosting from "./pages/CreateFoodPosting";
 import AllFoodPostings from "./pages/AllFoodPostings";
 import EditFoodPosting from "./pages/EditFoodPosting";
+import FoodPostInfo from "./pages/FoodPostInfo";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
+        <Route path="/foodpost-info/:postId" element={<FoodPostInfo />} />
         <Route element={<PrivateRoute />}>
           <Route path="/food-posting" element={<FoodPosting />} />
           <Route path="/profile" element={<Profile />} />
