@@ -40,6 +40,12 @@ const foodpostSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    publisherUsername: {
+      type: String,
+    },
+    publisherEmail: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

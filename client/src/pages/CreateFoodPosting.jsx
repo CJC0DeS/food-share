@@ -109,6 +109,8 @@ export default function FoodPosting() {
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
+          publisherEmail: currentUser.email,
+          publisherUsername: currentUser.username,
         }),
       });
       const data = await res.json();
