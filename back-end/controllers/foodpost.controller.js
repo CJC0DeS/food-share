@@ -69,3 +69,43 @@ export const getFoodPost = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllFoodPosts = async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const searchTerm = req.query.searchTerm || "";
+    const sort = req.query.sort || "createdAt";
+    const order = req.query.order === "asc" ? 1 : -1;
+
+    let servingCountFilter = {};
+    if (req.query.servingCount === "less than 10") {
+      servingCountFilter = { servings: { $gte: 1, $lt: 10 } };
+    } else if (req.query.servingCount === "less than 50") {
+      servingCountFilter = { servings: { $gt: 10, $lt: 50 } };
+    } else if (req.query.servingCount === "50 or above") {
+      servingCountFilter = { servings: { $gte: 50 } };
+    }
+
+    const matchedFoodposts = await Foodpost.find({
+      $and: [
+        {
+          $or: [
+            { name: { $regex: searchTerm, $options: "i" } },
+            { pickupAddress: { $regex: searchTerm, $options: "i" } },
+            { description: { $regex: searchTerm, $options: "i" } },
+            { mealType: { $regex: searchTerm, $options: "i" } },
+          ],
+        },
+        servingCountFilter,
+      ],
+    })
+      .sort({ [sort]: order })
+      .limit(limit)
+      .skip(startIndex);
+
+    return res.status(200).json(matchedFoodposts);
+  } catch (error) {
+    next(error);
+  }
+};
