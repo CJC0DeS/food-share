@@ -58,7 +58,7 @@ export const updateFoodpost = async (req, res, nest) => {
   }
 };
 
-export const getListing = async (req, res, next) => {
+export const getFoodPost = async (req, res, next) => {
   try {
     const foodPost = await Foodpost.findById(req.params.id);
     if (!foodPost) {
